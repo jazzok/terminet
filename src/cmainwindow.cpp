@@ -3,12 +3,18 @@
 /*
  *
  */
-CMainWindow::CMainWindow(QWidget *parent) : QWidget(parent)
+CMainWindow::CMainWindow(QWidget *parent) : QMainWindow(parent)
 {
-// Локальные переменные
-// Программа
 // Установка названия приложения
     QApplication::setApplicationName("TermiNet");
+
+//  Установака параметоров окна
+    setWindowTitle(QString("TermiNet"));
+    setWindowIcon(QIcon(""));
+//
+    menuBar = nullptr;
+    toolBar = nullptr;
+    statusBar = nullptr;
 
 // Определение каталога с файлами программы
     QDir dir(QApplication::applicationDirPath());
@@ -45,9 +51,14 @@ CMainWindow::CMainWindow(QWidget *parent) : QWidget(parent)
     tmpPath = QString("%1/%2").arg(QDir::tempPath())
                               .arg(QApplication::applicationName());
     dir.mkdir(tmpPath);
+///
+    createMenu();
+    createToolBar();
+    createStatusBar();
 
+    listWidget = new QListWidget(this);
 
-
+    setCentralWidget(listWidget);
 }
 
 /*
@@ -55,6 +66,19 @@ CMainWindow::CMainWindow(QWidget *parent) : QWidget(parent)
  */
 CMainWindow::~CMainWindow()
 {
+    menuBar->disconnect();
+    delete menuBar;
+    menuBar = nullptr;
+
+    toolBar->disconnect();
+    delete toolBar;
+    toolBar = nullptr;
+
+    statusBar->disconnect();
+    delete statusBar;
+    statusBar = nullptr;
+
+    delete listWidget;
 
 // Удаление временного каталога из системного Temp
     QDir dir(tmpPath);
@@ -71,6 +95,38 @@ CMainWindow::~CMainWindow()
 
 // Удаление каталога
     dir.rmdir(tmpPath);
+}
+
+void CMainWindow::createMenu()
+{
+    menuBar = new CMenuBar(this);
+    setMenuBar(menuBar);
+}
+
+void CMainWindow::createToolBar()
+{
+    toolBar = new CToolBar(this);
+    addToolBar(toolBar);
+}
+
+void CMainWindow::createStatusBar()
+{
+    statusBar = new CStatusBar(this);
+    setStatusBar(statusBar);
+    //    statusBar()->showMessage(QString("Ready"), 3000);
+}
+
+void CMainWindow::moveToCenter()
+{
+
+}
+
+void CMainWindow::showEvent(QShowEvent *e)
+{
+    if (e->spontaneous())
+    {
+
+    }
 }
 
 /*
@@ -196,4 +252,24 @@ void CMainWindow::closeEvent(QCloseEvent *e)
     }
     else
         e->ignore();
+}
+
+void CMainWindow::resizeEvent(QResizeEvent *e)
+{
+    if (e->spontaneous())
+    {
+
+    }
+}
+
+/*
+ *
+ */
+void CMainWindow::openOptionConfig()
+{
+    optionConfig = new COptionConfig(
+                &tmConfig,
+                &tmUserColor,
+                this);
+    optionConfig->show();
 }
